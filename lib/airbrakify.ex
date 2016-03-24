@@ -1,0 +1,2 @@
+defmodule Airbrakify do
+end
