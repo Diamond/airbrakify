@@ -5,48 +5,50 @@ defmodule Airbrakify.ErrorPlug do
       use Plug.ErrorHandler
 
       defp handle_errors(conn, error_trace) do
-        # IO.puts "\n\n\n"
-        # IO.inspect conn
-        # IO.puts "\n\n\n"
-        # IO.inspect error_trace.stack
-        # IO.puts "\n\n\n"
-        # error_trace
-        # |> parse_error(conn)
-        # |> IO.inspect
-        # IO.puts "\n\n\n"
-        # IO.puts "!!! UH OH SPAGHETTIOS !!!"
-        #
-        # IO.puts "Sending to Errbit"
+        Application.ensure_all_started(:airbrakify)
 
-        project_key = "00c461c614b6a58ea6989dccdacd10fa"
-        project_id  = "56f369e5d594004192000001"
-        url = "http://localhost:3000/api/v3/projects/" <> project_id <> "/notices?key=" <> project_key
+        project_key = "d1b4e219dc036ea93f6e255960483c79"
+        project_id  = "56f300d1d53cc8fadd00000c"
+        url = "http://localhost:3000/api/v3/projects/#{project_id}/notices?key=#{project_key}"
         headers = [{"Content-Type", "application/json"}, {"Accept", "application/json"}]
         payload = conn
           |> parse_error(error_trace)
           |> Poison.encode!
 
-        HTTPoison.post!(url, payload, headers)
+        IO.inspect HTTPoison.post!(url, payload, headers)
       end
 
-      def parse_stacktrace(type, stack) do
-        Enum.map(stack, fn line ->
-          {module, function, arity, [file: file, line: line]} = line
-          %{type: module, message: type, backtrace: %{file: file, line: line, function: "#{function}/#{arity}"}}
-        end)
+      def parse_stacktrace(type, message, stack) do
+        %{
+          type: type,
+          message: message,
+          backtrace: Enum.map(stack, fn line ->
+            {module, function, arity, [file: file, line: line]} = line
+            %{file: to_string(file), line: line, function: "(#{module}) #{function}/#{arity}"}
+          end)
+        }
+      end
+
+      def parse_reason(reason) do
+        case reason do
+          {struct, data} ->
+            %{type: inspect(struct.__struct__), message: inspect(struct) <> inspect(data)}
+          struct ->
+            %{type: inspect(struct.__struct__), message: inspect(struct)}
+        end
       end
 
       def parse_error(conn, %{kind: kind, reason: reason, stack: stack}) do
-        error_type = reason.__struct__
+        %{type: error_type, message: error_message} = parse_reason(reason)
         %{
-          errors: parse_stacktrace(error_type, stack),
+          errors: [parse_stacktrace(error_type, error_message, stack)],
           context: %{
             notifier: %{
               name:    "Airbrakify",
               version: "0.0.1",
               url:     "Airbrakify.com"
             },
-            environment: System.get_env,
+            environment: Mix.env,
             language: "Elixir #{System.version}",
             rootDirectory: System.cwd
           },
