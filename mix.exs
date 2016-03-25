@@ -28,9 +28,18 @@ defmodule Airbrakify.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:httpoison, "~> 0.8.2"},
-      {:poison,    "~> 2.1.0"},
-      {:plug,      "~> 1.1.2"}
+      {:httpoison, ">= 0.8.2"},
+      {:poison,    ">= 1.5.2"},
+      {:plug,      ">= 1.1.1"}
+    ]
+  end
+
+  defp package do
+    [
+      files: ["lib", "config", "test", "README.md", "mix.exs", "license"],
+      maintainers: ["Brandon Richey"],
+      licenses: ["MIT"],
+      links: %{"Github" => "https://github.com/Diamond/airbrakify"}
     ]
   end
 end

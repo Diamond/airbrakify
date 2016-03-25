@@ -1,6 +1,8 @@
 # Airbrakify
 
-**TODO: Add description**
+**Aibrakify** is the beginning of an Airbrake/Errbit library for Elixir/Phoenix projects. Right now, it's aimed as a Phoenix Plug to help you catch exceptions and report them to Errbit appropriately.
+
+This library currently has been tested and works with Errbit v0.5.0 and v0.6.0.
 
 ## Installation
 
@@ -17,4 +19,3 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
         def application do
           [applications: [:airbrakify]]
         end
-
