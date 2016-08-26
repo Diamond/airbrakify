@@ -9,7 +9,7 @@ defmodule Airbrakify.Parser do
           version: app_version,
           url:     "https://github.com/Diamond/airbrakify"
         },
-        environment: Mix.env,
+        environment: "Elixir",
         language: "Elixir #{System.version}",
         rootDirectory: System.cwd
       },
@@ -27,6 +27,26 @@ defmodule Airbrakify.Parser do
         {module, function, arity, [file: file, line: line]} = line
         %{file: to_string(file), line: line, function: "(#{module}) #{function}/#{arity}"}
       end)
+    }
+  end
+
+  def parse_message(type, message) do
+    %{
+      errors: [%{
+        type: type,
+        message: message
+      }],
+      context: %{
+        notifier: %{
+          name:    "Airbrakify",
+          version: app_version,
+          url:     "https://github.com/Diamond/airbrakify"
+        },
+        environment: "Elixir",
+        language: "Elixir #{System.version}",
+        rootDirectory: System.cwd
+      },
+      environment: environment_variables
     }
   end
 

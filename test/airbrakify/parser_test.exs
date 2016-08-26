@@ -71,7 +71,7 @@ defmodule ParserTest do
           version: app_version,
           url:     "https://github.com/Diamond/airbrakify"
         },
-        environment: Mix.env,
+        environment: "Elixir",
         language: "Elixir #{System.version}",
         rootDirectory: System.cwd
       },
